@@ -18,14 +18,14 @@ export default function App() {
   const [now, setNow] = useState(null);
 
   useEffect(() => {
-    // ustawiamy od razu po zamontowaniu, żeby zaliczyć pierwsze „tyknięcie”
+   
     const tick = () => setNow(new Date());
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
 
-  // formatowanie – tylko gdy `now` istnieje (po stronie klienta)
+ 
   const dateStr = now?.toLocaleDateString("pl-PL", {
     year: "numeric",
     month: "long",
