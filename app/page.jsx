@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-/* Brand icon colours (Tailwind text classes) */
 const iconColors = {
   YouTube: "text-[#FF0000]",
   Twitter: "text-[#1DA1F2]",
@@ -26,7 +25,6 @@ const iconColors = {
   ChatGPT: "text-[#10A37F]",
 };
 
-/* Send click to API (optimistic) */
 async function sendClick(label) {
   try {
     await fetch("/api/click", {
@@ -42,14 +40,13 @@ async function sendClick(label) {
 export default function App() {
   const buttonClasses = "bg-blue-600 text-white";
 
-  /* Default links */
   const defaultLinks = [
-    { href: "https://www.youtube.com", label: "YouTube", Icon: Youtube, builtIn: true },
-    { href: "https://twitter.com", label: "Twitter", Icon: Twitter, builtIn: true },
-    { href: "https://www.instagram.com", label: "Instagram", Icon: Instagram, builtIn: true },
-    { href: "https://mail.google.com", label: "Gmail", Icon: Mail, builtIn: true },
-    { href: "https://www.twitch.tv", label: "Twitch", Icon: Twitch, builtIn: true },
-    { href: "https://chat.openai.com", label: "ChatGPT", Icon: MessageCircle, builtIn: true },
+    { href: "https://www.youtube.com", label: "YouTube", Icon: Youtube },
+    { href: "https://twitter.com", label: "Twitter", Icon: Twitter },
+    { href: "https://www.instagram.com", label: "Instagram", Icon: Instagram },
+    { href: "https://mail.google.com", label: "Gmail", Icon: Mail },
+    { href: "https://www.twitch.tv", label: "Twitch", Icon: Twitch },
+    { href: "https://chat.openai.com", label: "ChatGPT", Icon: MessageCircle },
   ];
 
   const [links, setLinks] = useState(defaultLinks);
@@ -62,7 +59,7 @@ export default function App() {
     if (stored.length) {
       setLinks([
         ...defaultLinks,
-        ...stored.map((l) => ({ ...l, Icon: MessageCircle, builtIn: false })),
+        ...stored.map((l) => ({ ...l, Icon: MessageCircle })),
       ]);
     }
 
@@ -76,7 +73,7 @@ export default function App() {
     const stored = JSON.parse(localStorage.getItem("customLinks") || "[]");
     stored.push({ href, label });
     localStorage.setItem("customLinks", JSON.stringify(stored));
-    setLinks((p) => [...p, { href, label, Icon: MessageCircle, builtIn: false }]);
+    setLinks((p) => [...p, { href, label, Icon: MessageCircle }]);
   };
 
   const removeCustomLink = (label) => {
@@ -116,12 +113,12 @@ export default function App() {
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-xl mb-16">
-        {links.map(({ href, label, Icon, builtIn }, idx) => (
-          <div key={label} className="relative">
-            {deleteMode && !builtIn && (
+        {links.map(({ href, label, Icon }, idx) => (
+          <div key={label} className="relative group">
+            {deleteMode && (
               <button
                 onClick={() => removeCustomLink(label)}
-                className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 shadow"
+                className="absolute -top-2 -right-2 z-20 bg-red-600 text-white rounded-full p-1 shadow transition-all opacity-100 group-hover:opacity-100"
                 aria-label="Usuń link"
               >
                 <Trash2 className="w-4 h-4" />
@@ -137,7 +134,7 @@ export default function App() {
               transition={{ duration: 0.4, delay: idx * 0.05 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`flex flex-col items-center gap-2 rounded-2xl p-5 shadow hover:shadow-xl active:scale-95 ${buttonClasses}`}
+              className={`relative z-10 flex flex-col items-center gap-2 rounded-2xl p-5 shadow hover:shadow-xl active:scale-95 ${buttonClasses}`}
             >
               <Icon className={`w-6 h-6 ${iconColors[label] || "text-white"}`} />
               <span className="font-semibold">{label}</span>
@@ -170,7 +167,6 @@ export default function App() {
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <form
-            className="bg-gray-900 rounded-2xl p-6 w-full max-w-sm flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
               const fd = new FormData(e.target);
@@ -179,14 +175,19 @@ export default function App() {
               if (url && label) addCustomLink(url, label);
               setShowForm(false);
             }}
+            className="bg-gray-900 rounded-2xl p-6 w-full max-w-sm flex flex-col gap-4"
           >
-            <h2 className="text-xl font-bold">Dodaj link</h2>
-            <input name="label" placeholder="Nazwa" className="rounded px-4 py-2 bg-gray-800" />
-            <input name="url" placeholder="https://example.com" type="url" className="rounded px-4 py-2 bg-gray-800" />
-            <div className="flex gap-4 mt-2">
-              <button type="submit" className="flex-1 bg-blue-600 rounded px-4 py-2">Dodaj</button>
-              <button type="button" onClick={() => setShowForm(false)} className="flex-1 bg-gray-700 rounded px-4 py-2">Anuluj</button>
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-lg font-bold">Dodaj link</h2>
+              <button onClick={() => setShowForm(false)}>
+                <Close className="w-5 h-5 text-white" />
+              </button>
             </div>
+            <input name="label" placeholder="Nazwa" required className="rounded px-4 py-2 bg-gray-800 text-white" />
+            <input name="url" placeholder="https://example.com" type="url" required className="rounded px-4 py-2 bg-gray-800 text-white" />
+            <button type="submit" className="mt-2 bg-blue-600 text-white py-2 rounded hover:shadow-xl active:scale-95 transition">
+              Dodaj
+            </button>
           </form>
         </div>
       )}
