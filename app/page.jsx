@@ -16,10 +16,8 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-/*************************
- * Brand icon colours     *
- *************************/
-const iconColors: Record<string, string> = {
+/* Brand icon colours (Tailwind text classes) */
+const iconColors = {
   YouTube: "text-[#FF0000]",
   Twitter: "text-[#1DA1F2]",
   Instagram: "text-pink-500",
@@ -28,10 +26,8 @@ const iconColors: Record<string, string> = {
   ChatGPT: "text-[#10A37F]",
 };
 
-/*****************************
- * Optimistic click counting *
- *****************************/
-async function sendClick(label: string) {
+/* Send click to API (optimistic) */
+async function sendClick(label) {
   try {
     await fetch("/api/click", {
       method: "POST",
@@ -39,7 +35,7 @@ async function sendClick(label: string) {
       body: JSON.stringify({ label }),
     });
   } catch {
-    /* offline – ignore */
+    // offline – ignore
   }
 }
 
@@ -57,17 +53,16 @@ export default function App() {
   ];
 
   const [links, setLinks] = useState(defaultLinks);
-  const [stats, setStats] = useState<Record<string, number>>({});
+  const [stats, setStats] = useState({});
   const [showForm, setShowForm] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
 
-  /* Load custom links & stats on mount */
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("customLinks") || "[]");
     if (stored.length) {
       setLinks([
         ...defaultLinks,
-        ...stored.map((l: any) => ({ ...l, Icon: MessageCircle, builtIn: false })),
+        ...stored.map((l) => ({ ...l, Icon: MessageCircle, builtIn: false })),
       ]);
     }
 
@@ -77,30 +72,28 @@ export default function App() {
       .catch(() => {});
   }, []);
 
-  /* CRUD helpers */
-  const addCustomLink = (href: string, label: string) => {
+  const addCustomLink = (href, label) => {
     const stored = JSON.parse(localStorage.getItem("customLinks") || "[]");
     stored.push({ href, label });
     localStorage.setItem("customLinks", JSON.stringify(stored));
     setLinks((p) => [...p, { href, label, Icon: MessageCircle, builtIn: false }]);
   };
 
-  const removeCustomLink = (label: string) => {
+  const removeCustomLink = (label) => {
     const stored = JSON.parse(localStorage.getItem("customLinks") || "[]");
     localStorage.setItem(
       "customLinks",
-      JSON.stringify(stored.filter((l: any) => l.label !== label)),
+      JSON.stringify(stored.filter((l) => l.label !== label)),
     );
     setLinks((p) => p.filter((l) => l.label !== label));
   };
 
-  const handleLinkClick = (label: string) => {
+  const handleLinkClick = (label) => {
     setStats((s) => ({ ...s, [label]: (s[label] || 0) + 1 }));
     sendClick(label);
   };
 
-  /* Clock */
-  const [now, setNow] = useState<Date>(new Date());
+  const [now, setNow] = useState(new Date());
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
@@ -108,13 +101,11 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-black text-white px-4 py-10">
-      {/* Clock */}
       <div className="absolute top-4 right-4 font-mono text-xs sm:text-sm text-right select-none">
         <div>{now.toLocaleDateString("pl-PL", { year: "numeric", month: "long", day: "numeric" })}</div>
         <div>{now.toLocaleTimeString("pl-PL")}</div>
       </div>
 
-      {/* Logo */}
       <div className="flex flex-col items-center gap-2 mb-12">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="12" cy="12" r="10" />
@@ -124,7 +115,6 @@ export default function App() {
         <p className="text-sm text-gray-300">Twoje centrum szybkiego dostępu</p>
       </div>
 
-      {/* Links grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-xl mb-16">
         {links.map(({ href, label, Icon, builtIn }, idx) => (
           <div key={label} className="relative">
@@ -159,7 +149,6 @@ export default function App() {
         ))}
       </div>
 
-      {/* Google search */}
       <form action="https://www.google.com/search" method="GET" target="_blank" className="w-full max-w-md mb-20">
         <div className="flex items-center gap-2">
           <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
@@ -170,42 +159,34 @@ export default function App() {
         </div>
       </form>
 
-      {/* FAB add */}
       <button onClick={() => setShowForm(true)} className="fixed bottom-6 right-6 p-4 bg-blue-600 text-white rounded-full shadow-xl hover:shadow-2xl active:scale-95 transition" aria-label="Dodaj link">
         <Plus className="w-6 h-6" />
       </button>
 
-      {/* Delete toggle */}
       <button onClick={() => setDeleteMode((d) => !d)} className="fixed bottom-6 left-6 p-4 bg-red-600 text-white rounded-full shadow-xl hover:shadow-2xl active:scale-95 transition" aria-label="Usuń linki">
         {deleteMode ? <Close className="w-6 h-6" /> : <Minus className="w-6 h-6" />}
       </button>
 
-      {/* Modal form */}
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <form
+            className="bg-gray-900 rounded-2xl p-6 w-full max-w-sm flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              const fd = new FormData(e.currentTarget);
-              const label = fd.get("label")?.toString().trim();
-              const url = fd.get("url")?.toString().trim();
-              if (!label || !url) return;
-              addCustomLink(url, label);
+              const fd = new FormData(e.target);
+              const url = fd.get("url");
+              const label = fd.get("label");
+              if (url && label) addCustomLink(url, label);
               setShowForm(false);
             }}
-            className="bg-gray-900 rounded-2xl p-6 w-full max-w-sm flex flex-col gap-4"
           >
-            <div className="flex justify-between items-center mb-1">
-              <h2 className="text-lg font-bold text-white">Dodaj link</h2>
-              <button type="button" onClick={() => setShowForm(false)} className="p-1 hover:bg-gray-800 rounded-full" aria-label="Zamknij">
-                <Close className="w-4 h-4 text-white" />
-              </button>
+            <h2 className="text-xl font-bold">Dodaj link</h2>
+            <input name="label" placeholder="Nazwa" className="rounded px-4 py-2 bg-gray-800" />
+            <input name="url" placeholder="https://example.com" type="url" className="rounded px-4 py-2 bg-gray-800" />
+            <div className="flex gap-4 mt-2">
+              <button type="submit" className="flex-1 bg-blue-600 rounded px-4 py-2">Dodaj</button>
+              <button type="button" onClick={() => setShowForm(false)} className="flex-1 bg-gray-700 rounded px-4 py-2">Anuluj</button>
             </div>
-
-            <input name="label" placeholder="Nazwa linku" className="rounded px-4 py-2 bg-gray-800 text-white" required />
-            <input name="url" type="url" placeholder="https://example.com" className="rounded px-4 py-2 bg-gray-800 text-white" required />
-
-            <button type="submit" className="py-2 rounded bg-blue-600 text-white hover:shadow-xl active:scale-95 transition">Zapisz</button>
           </form>
         </div>
       )}
