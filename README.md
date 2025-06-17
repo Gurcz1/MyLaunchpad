@@ -1,35 +1,69 @@
-# MyLaunchpad
+## 🇵🇱 MyLaunchpad – Opis po polsku
 
-To prosta aplikacja do szybkiego otwierania ulubionych stron. Można dodać własne linki, posortować je przeciąganiem i wygodnie z nich korzystać z jednego miejsca.
+### Opis
 
-## Główne funkcje
+**MyLaunchpad** to minimalistyczna aplikacja typu „link-in-bio”, umożliwiająca szybki dostęp do najważniejszych stron internetowych w eleganckim, ciemnym interfejsie.
 
-- Zestaw gotowych przycisków (YouTube, Gmail, Twitter itd.)
-- Możliwość dodania własnych linków (lokalnie w przeglądarce)
-- Usuwanie linków przez tryb edycji
-- Sortowanie linków metodą drag & drop
-- Szukajka Google działająca jak natywne pole wyszukiwania
-- Czarne tło (stały tryb dark)
-- PWA – można zainstalować na telefonie lub komputerze
+**Funkcje:**
 
-## Technologies (EN)
+- ✅ Dodawanie własnych linków przez użytkownika (zapisywane w `localStorage`)
+- ✅ Drag & drop sortowanie linków (`@dnd-kit`)
+- ✅ Tryb edycji z ikoną kosza do usuwania
+- ✅ Ikony z kolorami brandowymi (YouTube, Instagram itd.)
+- ✅ Prawdziwe pole wyszukiwania Google
+- ✅ Subtelne animacje (hover/tap)
+- ✅ Zgodność z WCAG (kontrast, focus, role ARIA)
+- ✅ Responsywny układ kafelków
 
-- Next.js (no SSR)
-- React
-- Tailwind CSS
-- dnd-kit for drag-and-drop
-- localStorage (to save links)
-- No backend – everything works locally
+**Dodatki:**
 
-## How to run
+- Możliwość instalacji jako aplikacja PWA (manifest + ikonka)
+- Nagłówek z datą i godziną
+
+### Instalacja lokalna
 
 ```bash
-git clone https://github.com/Gurcz1/linki.git
-cd linki
 npm install
 npm run dev
 ```
 
-## Note
+Projekt stworzony w **Next.js 15**
 
-This project was made as a personal launcher – something I wanted for myself. You can easily expand or adjust it for your own needs.
+---
+
+## 🇬🇧 MyLaunchpad – English Version
+
+### Description
+
+**MyLaunchpad** is a minimalist link-in-bio web app for quick access to favorite websites in a sleek dark interface.
+
+**Features:**
+
+- ✅ User-added links (stored in `localStorage`)
+- ✅ Drag & drop link sorting (`@dnd-kit`)
+- ✅ Edit mode with trash icons
+- ✅ Brand-colored icons (YouTube, Instagram, etc.)
+- ✅ Real Google search input
+- ✅ Subtle animations (hover/tap)
+- ✅ WCAG-compliant (contrast, focus, ARIA roles)
+- ✅ Responsive grid layout
+
+**Extras:**
+
+- Installable as PWA (manifest + icon)
+- Header with live clock and date
+
+### Local installation
+
+```bash
+npm install
+npm run dev
+```
+
+Built with **Next.js 15**
+
+---
+
+## Autor / Author
+
+Projekt stworzony przez Gurcz1 ✌️ / Created by Gurcz1 ✌️
