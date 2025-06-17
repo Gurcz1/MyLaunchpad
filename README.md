@@ -23,6 +23,8 @@
 ### Instalacja lokalna
 
 ```bash
+git clone https://github.com/Gurcz1/linki.git
+cd linki
 npm install
 npm run dev
 ```
@@ -56,6 +58,8 @@ Projekt stworzony w **Next.js 15**
 ### Local installation
 
 ```bash
+git clone https://github.com/Gurcz1/linki.git
+cd linki
 npm install
 npm run dev
 ```
