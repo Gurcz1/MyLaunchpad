@@ -1,4 +1,4 @@
-## 🇵🇱 MyLaunchpad – Opis po polsku
+## 🇵🇱 MyLaunchpad 
 
 ### Opis
 
@@ -31,7 +31,7 @@ Projekt stworzony w **Next.js 15**
 
 ---
 
-## 🇬🇧 MyLaunchpad – English Version
+## EN MyLaunchpad
 
 ### Description
 
