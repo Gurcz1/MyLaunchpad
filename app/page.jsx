@@ -60,18 +60,6 @@ function SortableLink({ id, children }) {
   );
 }
 
-async function sendClick(label) {
-  try {
-    await fetch("/api/click", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ label }),
-    });
-  } catch {
-    // offline – ignore
-  }
-}
-
 export default function App() {
   const buttonClasses = "bg-blue-700 text-white focus-visible:ring-4 ring-offset-2 focus:outline-none";
 
@@ -85,7 +73,6 @@ export default function App() {
   ];
 
   const [links, setLinks] = useState(defaultLinks);
-  const [stats, setStats] = useState({});
   const [showForm, setShowForm] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
 
@@ -97,11 +84,6 @@ export default function App() {
       combined = ordered.map((label) => combined.find((l) => l.label === label)).filter(Boolean);
     }
     setLinks(combined);
-
-    fetch("/api/clicks")
-      .then((r) => (r.ok ? r.json() : {}))
-      .then((d) => setStats(d))
-      .catch(() => {});
   }, []);
 
   const addCustomLink = (href, label) => {
@@ -119,11 +101,6 @@ export default function App() {
     const newLinks = links.filter((l) => l.label !== label);
     setLinks(newLinks);
     localStorage.setItem("orderedLinks", JSON.stringify(newLinks.map((l) => l.label)));
-  };
-
-  const handleLinkClick = (label) => {
-    setStats((s) => ({ ...s, [label]: (s[label] || 0) + 1 }));
-    sendClick(label);
   };
 
   const handleDragEnd = (event) => {
@@ -180,7 +157,6 @@ export default function App() {
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={() => handleLinkClick(label)}
                     initial={{ opacity: 0, scale: 0.8, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: idx * 0.05 }}
@@ -191,9 +167,6 @@ export default function App() {
                   >
                     <Icon className={`w-6 h-6 ${iconColors[label] || "text-white"}`} />
                     <span className="font-semibold">{label}</span>
-                    <span className="text-xs opacity-80">
-                      {stats[label] ? `${stats[label]} użyć w tym tygodniu` : "-"}
-                    </span>
                   </motion.a>
                 </div>
               </SortableLink>
