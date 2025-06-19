@@ -13,6 +13,7 @@ import {
   Minus,
   X as Close,
   Trash2,
+  ExternalLink,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import {
@@ -123,6 +124,15 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-black text-white px-4 py-10">
+      <a
+        href="https://gurcz1.github.io/Strona/#"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute top-4 left-4 text-xs sm:text-sm underline hover:text-blue-500 transition flex items-center gap-1"
+      >
+        <ExternalLink className="w-4 h-4" /> Moja strona
+      </a>
+
       <div className="absolute top-4 right-4 font-mono text-xs sm:text-sm text-right select-none">
         <div>{now.toLocaleDateString("pl-PL", { year: "numeric", month: "long", day: "numeric" })}</div>
         <div>{now.toLocaleTimeString("pl-PL")}</div>
@@ -220,6 +230,7 @@ export default function App() {
           </form>
         </div>
       )}
+
     </div>
   );
 }
