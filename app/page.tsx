@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Youtube,
   Twitter,
@@ -22,6 +23,7 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
+  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -40,7 +42,22 @@ const iconColors = {
   ChatGPT: "text-[#10A37F]",
 };
 
-function SortableLink({ id, children }) {
+// Move defaultLinks outside component to fix useEffect dependency warning
+const defaultLinks = [
+  { href: "https://www.youtube.com", label: "YouTube", Icon: Youtube },
+  { href: "https://twitter.com", label: "Twitter", Icon: Twitter },
+  { href: "https://www.instagram.com", label: "Instagram", Icon: Instagram },
+  { href: "https://mail.google.com", label: "Gmail", Icon: Mail },
+  { href: "https://www.twitch.tv", label: "Twitch", Icon: Twitch },
+  { href: "https://chat.openai.com", label: "ChatGPT", Icon: MessageCircle },
+];
+
+interface SortableLinkProps {
+  id: string;
+  children: React.ReactNode;
+}
+
+function SortableLink({ id, children }: SortableLinkProps) {
   const {
     attributes,
     listeners,
@@ -61,33 +78,35 @@ function SortableLink({ id, children }) {
   );
 }
 
+interface LinkType {
+  href: string;
+  label: string;
+  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+}
+
+interface StoredLink {
+  href: string;
+  label: string;
+}
+
 export default function App() {
   const buttonClasses = "bg-blue-700 text-white focus-visible:ring-4 ring-offset-2 focus:outline-none";
 
-  const defaultLinks = [
-    { href: "https://www.youtube.com", label: "YouTube", Icon: Youtube },
-    { href: "https://twitter.com", label: "Twitter", Icon: Twitter },
-    { href: "https://www.instagram.com", label: "Instagram", Icon: Instagram },
-    { href: "https://mail.google.com", label: "Gmail", Icon: Mail },
-    { href: "https://www.twitch.tv", label: "Twitch", Icon: Twitch },
-    { href: "https://chat.openai.com", label: "ChatGPT", Icon: MessageCircle },
-  ];
-
-  const [links, setLinks] = useState(defaultLinks);
+  const [links, setLinks] = useState<LinkType[]>(defaultLinks);
   const [showForm, setShowForm] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("customLinks") || "[]");
-    const ordered = JSON.parse(localStorage.getItem("orderedLinks") || "[]");
-    let combined = [...defaultLinks, ...stored.map((l) => ({ ...l, Icon: MessageCircle }))];
+    const stored: StoredLink[] = JSON.parse(localStorage.getItem("customLinks") || "[]");
+    const ordered: string[] = JSON.parse(localStorage.getItem("orderedLinks") || "[]");
+    let combined = [...defaultLinks, ...stored.map((l: StoredLink) => ({ ...l, Icon: MessageCircle }))] as LinkType[];
     if (ordered.length) {
-      combined = ordered.map((label) => combined.find((l) => l.label === label)).filter(Boolean);
+      combined = ordered.map((label: string) => combined.find((l) => l.label === label)).filter(Boolean) as LinkType[];
     }
     setLinks(combined);
-  }, []);
+  }, []); // Now the dependency array is correct since defaultLinks is outside the component
 
-  const addCustomLink = (href, label) => {
+  const addCustomLink = (href: string, label: string) => {
     const stored = JSON.parse(localStorage.getItem("customLinks") || "[]");
     stored.push({ href, label });
     localStorage.setItem("customLinks", JSON.stringify(stored));
@@ -96,15 +115,15 @@ export default function App() {
     localStorage.setItem("orderedLinks", JSON.stringify(newLinks.map((l) => l.label)));
   };
 
-  const removeCustomLink = (label) => {
-    const stored = JSON.parse(localStorage.getItem("customLinks") || "[]");
-    localStorage.setItem("customLinks", JSON.stringify(stored.filter((l) => l.label !== label)));
+  const removeCustomLink = (label: string) => {
+    const stored: StoredLink[] = JSON.parse(localStorage.getItem("customLinks") || "[]");
+    localStorage.setItem("customLinks", JSON.stringify(stored.filter((l: StoredLink) => l.label !== label)));
     const newLinks = links.filter((l) => l.label !== label);
     setLinks(newLinks);
     localStorage.setItem("orderedLinks", JSON.stringify(newLinks.map((l) => l.label)));
   };
 
-  const handleDragEnd = (event) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (active.id !== over?.id) {
       const oldIndex = links.findIndex((i) => i.label === active.id);
@@ -175,7 +194,7 @@ export default function App() {
                     className={`relative z-10 flex flex-col items-center gap-2 rounded-2xl p-5 shadow hover:shadow-xl active:scale-95 ${buttonClasses}`}
                     role="menuitem"
                   >
-                    <Icon className={`w-6 h-6 ${iconColors[label] || "text-white"}`} />
+                    <Icon className={`w-6 h-6 ${iconColors[label as keyof typeof iconColors] || "text-white"}`} />
                     <span className="font-semibold">{label}</span>
                   </motion.a>
                 </div>
@@ -187,7 +206,13 @@ export default function App() {
 
       <form action="https://www.google.com/search" method="GET" target="_blank" className="w-full max-w-md mb-20">
         <div className="flex items-center gap-2">
-          <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
+          <Image 
+            src="https://www.google.com/favicon.ico" 
+            alt="Google" 
+            width={20}
+            height={20}
+            className="w-5 h-5" 
+          />
           <input name="q" placeholder="Szukaj w Google..." className="flex-grow rounded-l-2xl px-4 py-3 bg-gray-200 text-black" />
           <button type="submit" className="rounded-r-2xl px-4 py-3 bg-blue-700 text-white hover:shadow-xl active:scale-95 transition focus-visible:ring-4 ring-offset-2">
             <Search className="w-5 h-5" />
@@ -208,9 +233,9 @@ export default function App() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              const fd = new FormData(e.target);
-              const url = fd.get("url");
-              const label = fd.get("label");
+              const fd = new FormData(e.target as HTMLFormElement);
+              const url = fd.get("url") as string;
+              const label = fd.get("label") as string;
               if (url && label) addCustomLink(url, label);
               setShowForm(false);
             }}
@@ -218,7 +243,7 @@ export default function App() {
           >
             <div className="flex justify-between items-center mb-2">
               <h2 className="text-lg font-bold">Dodaj link</h2>
-              <button onClick={() => setShowForm(false)} aria-label="Zamknij formularz" role="button">
+              <button type="button" onClick={() => setShowForm(false)} aria-label="Zamknij formularz" role="button">
                 <Close className="w-5 h-5 text-white" />
               </button>
             </div>
